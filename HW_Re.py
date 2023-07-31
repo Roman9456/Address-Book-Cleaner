@@ -3,7 +3,7 @@ import re
 from pprint import pprint
 from difflib import SequenceMatcher
 
-# Функция для приведения номера телефона к формату +7(999)999-99-99 доб.9999
+# Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїСЂРёРІРµРґРµРЅРёСЏ РЅРѕРјРµСЂР° С‚РµР»РµС„РѕРЅР° Рє С„РѕСЂРјР°С‚Сѓ +7(999)999-99-99 РґРѕР±.9999
 def format_phone_number(phone_number):
     phone_number = phone_number.replace("(", "").replace(")", "").replace("-", "").replace(" ", "")
     if len(phone_number) == 10:
@@ -13,37 +13,37 @@ def format_phone_number(phone_number):
     else:
         return phone_number
 
-# Функция для сравнения строк ФИО
+# Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ СЃС‚СЂРѕРє Р¤РРћ
 def is_similar_name(name1, name2):
     similarity_ratio = SequenceMatcher(None, name1, name2).ratio()
     return similarity_ratio >= 0.7
 
-# Читаем адресную книгу в формате CSV в список contacts_list:
+# Р§РёС‚Р°РµРј Р°РґСЂРµСЃРЅСѓСЋ РєРЅРёРіСѓ РІ С„РѕСЂРјР°С‚Рµ CSV РІ СЃРїРёСЃРѕРє contacts_list:
 with open("phonebook_raw.csv", encoding='utf-8') as f:
     rows = csv.reader(f, delimiter=",")
     contacts_list = list(rows)
 
-# Удаляем заголовки столбцов
+# РЈРґР°Р»СЏРµРј Р·Р°РіРѕР»РѕРІРєРё СЃС‚РѕР»Р±С†РѕРІ
 header = contacts_list.pop(0)
 
-# Словарь для хранения данных о человеках
+# РЎР»РѕРІР°СЂСЊ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РґР°РЅРЅС‹С… Рѕ С‡РµР»РѕРІРµРєР°С…
 contacts_dict = {}
 
 for contact in contacts_list:
-    # Объединяем номер телефона и email в одну строку
+    # РћР±СЉРµРґРёРЅСЏРµРј РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° Рё email РІ РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ
     contact[5] = format_phone_number(contact[5])
     contact[6] = contact[6].strip()
 
-    # Объединяем ФИО в одну строку, учитывая пустые значения
+    # РћР±СЉРµРґРёРЅСЏРµРј Р¤РРћ РІ РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ, СѓС‡РёС‚С‹РІР°СЏ РїСѓСЃС‚С‹Рµ Р·РЅР°С‡РµРЅРёСЏ
     full_name = " ".join(part for part in contact[:3] if part.strip())
     match = re.match(r"(\S+)\s+(\S+)\s+(\S+)", full_name)
     if match:
         lastname, firstname, surname = match.groups()
     else:
-        # Если регулярное выражение не сработало, считаем, что ФИО уже разделены
+        # Р•СЃР»Рё СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РЅРµ СЃСЂР°Р±РѕС‚Р°Р»Рѕ, СЃС‡РёС‚Р°РµРј, С‡С‚Рѕ Р¤РРћ СѓР¶Рµ СЂР°Р·РґРµР»РµРЅС‹
         lastname, firstname, surname = contact[0], contact[1], contact[2]
 
-    # Поиск схожей записи ФИО в словаре
+    # РџРѕРёСЃРє СЃС…РѕР¶РµР№ Р·Р°РїРёСЃРё Р¤РРћ РІ СЃР»РѕРІР°СЂРµ
     similar_contact_id = None
     for person_id, existing_contact in contacts_dict.items():
         existing_full_name = " ".join(part for part in existing_contact[:3] if part.strip())
@@ -51,24 +51,24 @@ for contact in contacts_list:
             similar_contact_id = person_id
             break
 
-    # Если запись о человеке с схожим ФИО уже существует, объединяем информацию
+    # Р•СЃР»Рё Р·Р°РїРёСЃСЊ Рѕ С‡РµР»РѕРІРµРєРµ СЃ СЃС…РѕР¶РёРј Р¤РРћ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РѕР±СЉРµРґРёРЅСЏРµРј РёРЅС„РѕСЂРјР°С†РёСЋ
     if similar_contact_id:
         existing_contact = contacts_dict[similar_contact_id]
-        # Заполняем пустые значения из новой записи
+        # Р—Р°РїРѕР»РЅСЏРµРј РїСѓСЃС‚С‹Рµ Р·РЅР°С‡РµРЅРёСЏ РёР· РЅРѕРІРѕР№ Р·Р°РїРёСЃРё
         for i in range(len(existing_contact)):
             if not existing_contact[i] and contact[i]:
                 existing_contact[i] = contact[i]
     else:
-        # Если контакт отсутствует в словаре, добавляем его
+        # Р•СЃР»Рё РєРѕРЅС‚Р°РєС‚ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РІ СЃР»РѕРІР°СЂРµ, РґРѕР±Р°РІР»СЏРµРј РµРіРѕ
         contacts_dict[(lastname, firstname)] = [lastname, firstname, surname, contact[3], contact[4], contact[5], contact[6]]
 
-# Преобразуем словарь обратно в список, чтобы сохранить в файл
+# РџСЂРµРѕР±СЂР°Р·СѓРµРј СЃР»РѕРІР°СЂСЊ РѕР±СЂР°С‚РЅРѕ РІ СЃРїРёСЃРѕРє, С‡С‚РѕР±С‹ СЃРѕС…СЂР°РЅРёС‚СЊ РІ С„Р°Р№Р»
 new_contacts_list = [header] + list(contacts_dict.values())
 
-# Выводим получившиеся данные на экран
+# Р’С‹РІРѕРґРёРј РїРѕР»СѓС‡РёРІС€РёРµСЃСЏ РґР°РЅРЅС‹Рµ РЅР° СЌРєСЂР°РЅ
 pprint(new_contacts_list)
 
-# Сохраняем получившиеся данные в другой файл в формате CSV:
+# РЎРѕС…СЂР°РЅСЏРµРј РїРѕР»СѓС‡РёРІС€РёРµСЃСЏ РґР°РЅРЅС‹Рµ РІ РґСЂСѓРіРѕР№ С„Р°Р№Р» РІ С„РѕСЂРјР°С‚Рµ CSV:
 with open("phonebook.csv", "w", newline='', encoding='utf-8') as f:
     datawriter = csv.writer(f, delimiter=',')
     datawriter.writerows(new_contacts_list)
